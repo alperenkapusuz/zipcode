@@ -1,5 +1,5 @@
 import { View, Text, FlatList } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { iller } from "./src/iller";
 import SelectDropdown from "react-native-select-dropdown";
@@ -7,6 +7,7 @@ import SelectDropdown from "react-native-select-dropdown";
 const App = () => {
   const [selectedCity, setSelectedCity] = useState();
   const [selectedDistrict, setSelectedDistrict] = useState();
+  const [selectedNeighbourhood, setSelectedNeighbourhood] = useState();
   const [pk, setPk] = useState(0);
   const dataHandler = async (plaka) => {
     await axios
@@ -15,12 +16,24 @@ const App = () => {
       .catch((err) => console.error(err));
   };
 
-  function groupBy(arr, prop) {
-    const map = new Map(Array.from(arr, (obj) => [obj[prop], []]));
-    arr.forEach((obj) => map.get(obj[prop]).push(obj));
-    console.log(Array.from(map.values()));
-    return Array.from(map.values());
-  }
+  useEffect(() => {
+    if (
+      selectedCity == null &&
+      selectedDistrict == null &&
+      selectedNeighbourhood == null
+    ) {
+      return;
+    }
+    // let temp = Array.from(new Set(selectedCity.postakodu.map((x) => x.ilce)));
+    // console.log("TEMP", temp);
+    // let temp = Array.from(
+    //   new Set(selectedCity.postakodu.filter((x) => x.ilce == selectedDistrict))
+    // );
+    let temp = selectedCity.postakodu.filter(
+      (x) => x.ilce == selectedDistrict && x.mahalle == selectedNeighbourhood
+    )[0].pk;
+    setPk(temp);
+  }, [selectedNeighbourhood]);
 
   return (
     <View>
@@ -40,48 +53,47 @@ const App = () => {
         <View>
           <SelectDropdown
             data={Array.from(
-              new Set(
-                selectedCity.postakodu
-                  .map((x) => x.ilce)
-                  .forEach((x) => console.log(x))
-              )
-            ).map((x) => {
-              {
-                ilce: x;
-              }
-            })}
-            onSelect={(selectedItem, index) => {
-              //setSelectedDistrict(selectedItem);
-              console.log(selectedItem);
-            }}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              console.log("ITEM " + item);
-              return item.ilce;
-            }}
-          />
-        </View>
-      )}
-      {/* {selectedDistrict != null && (
-        <View>
-          <SelectDropdown
-            data={selectedDistrict}
+              new Set(selectedCity.postakodu.map((x) => x.ilce))
+            )}
             onSelect={(selectedItem, index) => {
               setSelectedDistrict(selectedItem);
             }}
             buttonTextAfterSelection={(selectedItem, index) => {
-              setPk(item.pk);
               return selectedItem;
             }}
             rowTextForSelection={(item, index) => {
-              return `${item.ilce} - ${item.semt_bucak_belde} ${item.mahalle}`;
+              return item;
             }}
           />
         </View>
-      )} */}
-      {pk != 0 && <Text>{pk}</Text>}
+      )}
+      {selectedDistrict != null && (
+        <View>
+          <SelectDropdown
+            data={Array.from(
+              new Set(
+                selectedCity.postakodu
+                  .filter((x) => x.ilce == selectedDistrict)
+                  .map((x) => x.mahalle)
+              )
+            )}
+            onSelect={(selectedItem, index) => {
+              setSelectedNeighbourhood(selectedItem);
+            }}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return `${item}`;
+            }}
+          />
+        </View>
+      )}
+      {pk != 0 && (
+        <Text>
+          {`${selectedCity.postakodu[0].il} ${selectedDistrict} ${selectedNeighbourhood} ${pk}`}
+        </Text>
+      )}
     </View>
   );
 };
