@@ -1,7 +1,7 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { iller } from "./iller";
+import { iller } from "./assets/data/iller";
 import SelectDropdown from "react-native-select-dropdown";
 
 const App = () => {
