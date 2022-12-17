@@ -24,11 +24,6 @@ const App = () => {
     ) {
       return;
     }
-    // let temp = Array.from(new Set(selectedCity.postakodu.map((x) => x.ilce)));
-    // console.log("TEMP", temp);
-    // let temp = Array.from(
-    //   new Set(selectedCity.postakodu.filter((x) => x.ilce == selectedDistrict))
-    // );
     let temp = selectedCity.postakodu.filter(
       (x) => x.ilce == selectedDistrict && x.mahalle == selectedNeighbourhood
     )[0].pk;
